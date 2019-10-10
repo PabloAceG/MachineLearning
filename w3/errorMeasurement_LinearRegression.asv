@@ -1,0 +1,45 @@
+clear variables;
+close all;
+clc;
+% Load and draw points
+load weightData;
+
+scatter(X, Y, 'filled')
+
+xlabel('height')
+ylabel('weight')
+% %%%%%%%%%%%%%%%%%%%%
+
+% Perceptron 
+xMin = 1.6;
+xMax = 1.9;
+
+xlim([xMin xMax]);
+
+a = -16;
+b =  14;
+
+% Calculate y-values
+fxMin = a + b .* xMin;
+fxMax = a + b .* xMax;
+
+% Plot function
+hold on
+plot(xlim, [fxMin, fxMax])
+% %%%%%%%%%%%%%%%%%%%%
+
+% Mean Square Error 
+mseXY = mse(a, b, X, Y)
+
+% Linear Regression
+[a, b] = lingRef(X, Y);
+
+mseOpt = mse(a, b, X, Y)
+
+fxMin = a + b .* xMin;
+fxMax = a + b .* xMax;
+
+% Visualizacion
+hold on
+plot(xlim, [fxMin, fxMax])
+
