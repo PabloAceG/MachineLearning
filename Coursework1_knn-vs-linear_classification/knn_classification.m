@@ -42,7 +42,7 @@ function knn_avg_err = knn_classification(kDiv, k_value, filename)
     cd(fileparts(mfilename('fullpath')));
 
     % Creates file in case it does not existe
-    edit(strcat('./knnlog/', filename));
+    filename = strcat("logs/knnlog/", filename);
     % Open file 
     logFile = fopen(filename, 'w');
 
@@ -73,7 +73,7 @@ function knn_avg_err = knn_classification(kDiv, k_value, filename)
         % Column2: Meas
         % Column3: Species Predicted
         % Column4: Species Labeled
-        knn = cell(length(k_values), 4);
+        knn = cell(length(kDiv), 4);
         knn(:, 2) = {[100]};
 
         %                            ========

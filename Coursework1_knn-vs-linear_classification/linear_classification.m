@@ -42,8 +42,7 @@ function lin_avg_err = linear_classification(kDiv, filename)
     cd(fileparts(mfilename('fullpath')));
 
     % Creates file in case it does not existe
-    edit(filename);
-    % Open file 
+    filename = strcat("logs/linearlog/", filename);
     logFile = fopen(filename, 'w');
 
     % Writes in log file
