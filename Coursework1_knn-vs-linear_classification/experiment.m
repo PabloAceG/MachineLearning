@@ -49,7 +49,11 @@ iterations = 150;
 knn_errs   = zeros(iterations, 2); 
 
 for i = 1 : 1 : iterations
-
+    knn_errs(i, :) = [i,
+                      knn_classification(10, i, ...
+                                        strcat('knnExperimentk', ...
+                                               num2str(i),       ...
+                                               '.log'))];
 end
 
 %                              ==========

@@ -3,15 +3,15 @@
 % COURSEWORK 1: EXPERIMENTAL COMPARISON OF K-NN AND LINEAR CLASSIFICATION
 % ON THE IRIS DATA-SET
 % AUTHOR: PABLO ACEREDA
-% FILE:   LINEAR_CLASSIFICATION.M
+% FILE:   KNN_CLASSIFICATION.M
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function lin_avg_err = linear_classification(kDiv, filename)
+function knn_avg_err = knn_classification(kDiv, k_value, filename)
 
     %                              LOAD DATA
     %                             ===========
-    load fisheriris meas species
+    load fisheriris meas species 
 
     %                                DATA 
     %                               ======
@@ -42,7 +42,7 @@ function lin_avg_err = linear_classification(kDiv, filename)
     cd(fileparts(mfilename('fullpath')));
 
     % Creates file in case it does not existe
-    edit(filename);
+    edit(strcat('./knnlog/', filename));
     % Open file 
     logFile = fopen(filename, 'w');
 
@@ -55,7 +55,7 @@ function lin_avg_err = linear_classification(kDiv, filename)
             kDiv);
 
     % Valid number of divisions
-    if kDiv < N
+    if kDiv <= N
 
         % Write into log
         fprintf(logFile,                             ...
@@ -73,8 +73,8 @@ function lin_avg_err = linear_classification(kDiv, filename)
         % Column2: Meas
         % Column3: Species Predicted
         % Column4: Species Labeled
-        lin = cell(length(kDiv), 4);
-        lin(:, 2) = {[100]};
+        knn = cell(length(k_values), 4);
+        knn(:, 2) = {[100]};
 
         %                            ========
         %                             K-FOLD
@@ -99,9 +99,9 @@ function lin_avg_err = linear_classification(kDiv, filename)
 
                 testX  = X((i - 1) * jump + 1 : i * jump, :);
                 testY  = Y((i - 1) * jump + 1 : i * jump, :);
-                trainX = [X(1 : (i - 1) * jump, :) ; ...
+                trainX = [X(1 : (i - 1) * jump, :); ...
                           X(i * jump + 1: end, :)];
-                trainY = [Y(1 : (i - 1) * jump, :) ; ...
+                trainY = [Y(1 : (i - 1) * jump, :); ...
                           Y(i * jump + 1: end, :)];
 
             else
@@ -113,45 +113,42 @@ function lin_avg_err = linear_classification(kDiv, filename)
 
             end
 
-            %                         ========
-            %                          LINEAR
-            %                         ========
+            %                          =====
+            %                           KNN
+            %                          =====
 
-            %                           MODEL
-            Mdl_linear = fitcecoc(trainX, trainY, ...
-                                  'ClassNames', ["setosa",     ...
-                                                 "versicolor", ...
-                                                 "virginica"]);
-            %                          TESTING
-            pred_lin = predict(Mdl_linear, testX);
-            %                           ERROR
-            err_lin = costfunction(testY, pred_lin) / length(testY);
+            %                          MODEL
+            Mdl_knn = fitcknn (trainX, trainY, 'NumNeighbors', k_value);
+            %                         TESTING
+            pred_knn = predict(Mdl_knn, testX);
+            %                          ERROR
+            err_knn = costfunction(testY, pred_knn) / length(testY);
 
             % Writes in log
             fprintf(logFile,                          ...
-                    ['// LINEAR \\\\\n',              ...
+                    ['** KNN (k=%i) **\n',            ...
                      'Prediction for training: %s\n', ...
                      'Actual values:           %s\n', ...
                      'Error: %f\n'],                  ...
-                    strjoin(pred_lin),                ...
-                    strjoin(testY),                   ...
-                    err_lin);
+                      k_value,                        ...
+                      strjoin(pred_knn),              ...
+                      strjoin(testY),                 ...
+                      err_knn);
 
             %                      ERROR STORAGE
-            lin(i, :) = {[err_lin] [trainX] [pred_lin] [testY]};
+            knn(i, :) = {[err_knn] [trainX] [pred_knn] [testY]};
 
             % Log: extra separation
             fprintf(logFile, '\n');
-
         end
     % ------------------------------------------------------------------- %
 
-        lin_avg_err = sum(cell2mat(lin(:, 1))) / length(lin);
+        knn_avg_err = sum(cell2mat(knn(:, 1))) / length(knn);
 
         fprintf(logFile,                                                ...
                 ['\n===============================================\n', ...
-                'Linear Mean Error: %f'],                                      ...
-                lin_avg_err);
+                'kNN Mean Error: %f'],                                      ...
+                knn_avg_err);
 
     else
         fprintf(logFile,                             ...
@@ -165,7 +162,7 @@ function lin_avg_err = linear_classification(kDiv, filename)
 
     % Writes everything in log
     fclose(logFile);
-
-    lin_avg_err;
+    
+    knn_avg_err;
 
 end
