@@ -190,12 +190,12 @@ cross-valitadion method k-fold.
 \subsection{Models - kNN and Linear Classification}
 
 %                            ===== KNN =====
-\subsubsection{K-Nearest-Neightbors}
+\subsubsection{K-Nearest-Neighbors}
 
-To classify a new input, by checking which are the closest neightbors; that is
+To classify a new input, by checking which are the closest neighbors; that is
 the scope this classification method uses. It is possible to understand how it
 works at a glance, when the model is trained by labeled data, it can predict the
-class/specie/category of the sample just by computing the k-nearest neightbours;
+class/specie/category of the sample just by computing the k-nearest neighbours;
 using the \textit{euclidean distance}.
 
 For two dimensions, the formula goes as follows:
@@ -223,7 +223,7 @@ predictor variables.
 A very important argument, or list of arguments, which can be specified after
 any of the aforementioned variables is the \textit{Name-Value} Pair Arguments.
 They allow to edit properties like what breaks ties in case several samples have
-the same properties; the value for k (how many neightbors are selected to decide
+the same properties; the value for k (how many neighbors are selected to decide
 the specie), \ldots
 
 %                     ===== LINEAR CLASSIFICATION =====
@@ -268,12 +268,13 @@ implemented manually.
 \subsection{Application - Models to Dataset}
 
 All these theory is very accurate, and also compelling but, how is this going to
-help with the Iris Dataset? Fairly simple, by creating different models that
-should be able to predict the specie of new inputs of data.
+help with the Iris Dataset? Fairly simple, by implementin.g a k-fold
+crossvalidation which will allow to know the accuracy of the models for the
+given data.
 
-With kNN, the more neightbors that are from the same specie, the more chances
-that input has to be from that specie. Varying values for k might also be
-helpful when it comes to accuracy.
+With kNN, the more neighbors that are from the same specie, the more chances
+that input has to be from that specie. Varying the significant number of
+neighbors, specified by k might also be helpful when it comes to accuracy.
 
 On the other hand, linear classification uses multiclass linear equations to
 predict if the given new sample is from one specie or not. In this case, no
@@ -304,7 +305,8 @@ follows:
 
   & Compute error based on the predicted labels and their actual values.
 
-  & Select least error model, as the average of the k-folding implementation.
+  & Compute the average of all the errors obtained in each iteration performed 
+  by the k-fold crossvalidation.
 
   & Data visualization.
 
@@ -375,35 +377,28 @@ not available, albeit it is more accurate, it cannot be implemented.
 
 \section{Conclusion}
 
-In brief, it has been used two different classification models, changing
-individual parameters; also, the implementation of k-fold crossvalidation which
-lead to the best overall trained model for both linear and kNN classifications.
+In brief, it has been used two different classification models. It has also been
+used k-fold crossvalidation to find the error rate of each model.
 
-But the results seem to conclude that the dataset is not large enough, as the
-models most of the models give a 100\% of accuracy, which suggest that for
-values of k, in k-fold crossvalidation, over 10 the testing data is not large 
-enough. On the other hand, if in k-fold crossvalidation, if k is reduced so that 
-testing data has a larger number of samples, the training data is not enough to 
-train a good model.
+Looking at the results, it can be observed that the most suitable value for
+k-fold in linear classification is surprisingly, 100 (after repeating the
+program 20 times). The values for k have been changed from 10 to 100 taking 
+steps of 10 at a time. This might make sense; when data is divided into 100 
+different pieces, the testing chunks are formed by two elements, which rarely 
+gives an error rate higher than 0.
 
-Despite that fact, kNN perceives a lost in accuracy when k becomes too large
-(it has been tested with values of k = 50 or k = 100). Albeit, once again due to
-the number of samples being too small, changing values of k when k < 10 does not
-really change the classification of the tested samples. According to
-documentation found from kNN classification, it can be used the method known as
-\textit{Elbow Method}, where the optimal value for k is found by iterating
-through different k values, and using kfold crossvalidation (where 5 <= k <=
-10). The conclusion remanins the same, there are not enough samples to perform
-such a method with valid results.
+On the other hand, in kNN the value for k in k-fold has been fixed to 10,
+changing instead the number of neighbors (from 1 to 150). After looking at 
+different executions (once again, 20 runs), the most suitable number of 
+neighbors seems to be 17.
 
-Also, other aspect that should be taken into account is the resources
-consumption of kNN algorith, which as sustantially higher than Linear
-Classification, so available resources could also be the key point to decide on 
-the algorithm to use. Not to mention, kNN is more time consuming that Linear
-Classification. 
-
-I would personally recommend Linear Classification, the error obtained is not
-very different from kNN, but it consumes less resources.
+The writer of the article has the beliefs that the selection of the
+classification method depends on the number of samples in the model mainly: if
+the number of samples is too large, kNN classification takes too much time to
+label new elements. On the other hand, if resources and time are not that
+important, linear classification would mean the loss of classification accuracy
+for most cases (kNN looses accuracy after the number of neighbors reaches 80,
+error rate goes through the roof).
 
 \newpage
 
