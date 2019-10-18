@@ -331,7 +331,7 @@ testing.
 
 The complexity of this procedure is not inherently very high; once data has been
 separated into chunks from the same size, it is just needed to specify certain
-parameters at most (\hyperref[mdls]{\ref{mdls}}).
+parameters at most.
 
 It is not needed any forward step to obtain and test the models.
 
@@ -404,6 +404,15 @@ error rate goes through the roof).
 
 \section*{Appendix: Code}
 
+The code has been developed in MATLAB. It has been separated in different
+chuncks regarding the behaviour of each block.
+
+\begin{figure}[h]
+ \centering
+ \includegraphics[width=0.8\textwidth]{../diagrams/call_tree.png}
+ \caption{Structure of the program - Call Graph.}
+\end{figure}
+
 As any respected MATLAB implementation, first of all is needed to have a clean
 enviroment:
 
@@ -418,25 +427,17 @@ clc;
 %-------------------------------------------------------------------------%
 \end{minted}
 
-Now it is turn to load the data, and order it randomly so that later it is
-easier to perform the k-fold crossvalidation.
+Afterwards, data is loaded, also creating the folders used for the log files (in
+case they do not exists).
 
 \begin{minted}{matlab}
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% COURSEWORK 1: EXPERIMENTAL COMPARISON OF K-NN AND LINEAR CLASSIFICATION
-% ON THE IRIS DATA-SET
-% AUTHOR: PABLO ACEREDA
-
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 %                              LOAD DATA
 %                             ===========
-load fisheriris
-    
+load fisheriris meas species
+
 %                                DATA 
 %                               ======
-    
+
 % Want to order samples randomly to apply cross-validation
 P = randperm(length(species));
 
@@ -449,295 +450,110 @@ X = meas(P, :);
 % - Versicolor
 % - Virginica
 Y = species(P);
-\end{minted}
 
-Once the data is obtained, it might be a good idea to ask the user on the size
-of the chunks of data. It has also been implemented a log file from which all
-operations will be recovered post-execution.
+%                             LOGS FOLDERS
+%                            ==============
 
-\begin{minted}{matlab}
-%                     DATA PARTITIONING INFORMATION
-%                    ===============================
+if ~exist("logs/linearlog", 'dir')
+   mkdir("logs/linearlog")
+   
+   disp("Directory logs/linearlog/ has been created.")
+end
 
-kDiv = input(['How many divisions do you want in the sample data ', ...
-              '(more that one divisions: (k > 1)?\n']);
-N    = length(species);
-jump = ceil(N / kDiv);
-%                          LOG FILE CREATION
-%                         ===================
-
-% File name
-filename = 'experiments.log';
-% Moves path to file's path
-cd(fileparts(mfilename('fullpath')));
-
-% Creates file in case it does not existe
-edit(filename);
-% Open file 
-logFile = fopen(filename, 'w');
-
-% Writes in log file
-fprintf(logFile,                                           ...
-        ['INFO: ',                                         ...
-         '==== NEW EXPERIMENT ====\n',                     ...
-         'INFO: ',                                         ...
-         'Data is going to be divided into %i pieces.\n'], ...
-        kDiv);
-\end{minted}
-
-Some other variables and data is needed along the execution of the program. It
-is a good practice to initialize the values and the format before they are used.
-
-\begin{minted}{matlab}
-% Valid number of divisions
-if kDiv < N
-    
-    % Write into log
-    fprintf(logFile,                             ...
-            ['INFO: ',                           ...
-             'The value for k is valid ',        ...
-             '(k[%i] < number of samples[%i]) ', ...
-             '-> VALID.\n'],                     ...
-            kDiv,                                ...
-            N);
-    
-    %                            VARIABLES
-    %                           ===========
-    
-    % Later used for the plots
-    redRGB   = [255, 0, 0] / 256;
-    greenRGB = [0, 255, 0] / 256;
-    blueRGB  = [0, 0, 255] / 256;
-    
-    colors = [redRGB, greenRGB, blueRGB];
-          
-    % Species available
-    speciesStr = ['setosa', 'versicolor', 'virginica'];
-    
-    % Each column is a different k value
-    k_values = input('Insert values for k in kNN (p.e: [1 3 5]).\n');
-    % Write into log
-    fprintf(logFile, ...
-           ['INFO: ', ...
-            'The values used for kNN are: %s.\n'], ...
-            mat2str(k_values));
-    
-    % Column1: Model
-    % Column2: Error
-    % Column3: Meas
-    % Column4: Species
-    lin = {[] [100] [] []};
-    knn = cell(length(k_values), 4);
-    knn(:, 2) = {[100]};
-else
-    fprintf(logFile,                             ...
-            ['ERROR: ',                          ...
-             'The value for k is too large ',    ...
-             '(k[%i] < number of samples[%i]) ', ...
-             '-> VALID.\n'],                     ...
-            kDiv,                                ...
-            N);
+if ~exist("logs/knnlog", 'dir') 
+   mkdir("logs/knnlog")
+   
+   disp("Directory logs/knnlog/ has been created.")
 end
 \end{minted}
 
-Having decided whether the number of divisions for the samples is valid or not,
-is time to actually split the data. It is done by iterating through the data
-set. At each iteration, data is separated in training and testing samples.
- 
+Afterwards, the functions that perform the linear and the kNN classification are
+called: in the case of linear classification, the values for k-folding are
+changed as an experiment; in the case of kNN classification, all the possible 
+number of neighbors are tested to find the optimal. As the time consumed to
+perform all the operations can be long, there are printed some debbuging
+messages to make sure the program has not crushed.
+
 \begin{minted}{matlab}
-    %                            ========
-    %                             K-FOLD
-    %                            ========
-    
-    for i = 1 : 1 : kDiv
-        
-        % Writes in log
-        fprintf(logFile,                     ...
-                '\n-- K-FOLD: %i/%i --\n\n', ...
-                i,                           ...
-                kDiv);
-        
-        if     i == 1
-            
-            testX  = X(       1 : jump, :);
-            testY  = Y(       1 : jump, :);
-            trainX = X(jump + 1 : end,  :);
-            trainY = Y(jump + 1 : end,  :);
-            
-        elseif i * jump <= N && i < kDiv 
-            
-            testX  = X((i - 1) * jump + 1 : i * jump, :);
-            testY  = Y((i - 1) * jump + 1 : i * jump, :);
-            trainX = [X(1 : (i - 1) * jump, :) ; X(i * jump + 1: end, :)];
-            trainY = [Y(1 : (i - 1) * jump, :) ; Y(i * jump + 1: end, :)];
-            
-        else
-            
-            testX  = X((i - 1) * jump + 1 : end, :);
-            testY  = Y((i - 1) * jump + 1 : end, :);
-            trainX = X(1                  : (i - 1) * jump     , :);
-            trainY = Y(1                  : (i - 1) * jump     , :);
-            
-        end
+%                                 LINEAR
+%                                ========
+
+iterations = 10; 
+lin_errs   = zeros(iterations, 2);
+
+disp("Linear classification is executing")
+
+for i = 1 : 1 : iterations
+    lin_errs(i, :) = [i * 10,                                           ...
+                      linear_classification(10 * i,                     ...
+                                            strcat('linearExperimentk', ...
+                                                   num2str(10 * i),     ...
+                                                   '.log'))];
+                      
+end
+
+% Minimal error Linear Classification
+min_lin_err = min(lin_errs(:, 2));
+min_lin_err = lin_errs(:, 2) == min_lin_err;
+min_lin_err = lin_errs(min_lin_err == 1, :);
+
+disp(strjoin(["The minimum error for linear classification is ", ...
+              num2str(min_lin_err(2)),                           ...
+              " for k = ",                                       ...
+              num2str(min_lin_err(1))]))
+disp("Linear classification has been executed successfully")
+disp("")
+
+%                                  KNN
+%                                 =====
+
+iterations = 150;
+knn_errs   = zeros(iterations, 2); 
+
+disp("kNN classification is about to be executed")
+
+for i = 1 : 1 : iterations
+    knn_errs(i, :) = [i,                                         ...
+                      knn_classification(10, i,                  ...
+                                        strcat('knnExperimentk', ...
+                                               num2str(i),       ...
+                                               '.log'))];
+end
+
+% Minimal error Linear Classification
+min_knn_err = min(knn_errs(:, 2));
+min_knn_err = knn_errs(:, 2) == min_knn_err;
+min_knn_err = knn_errs(min_knn_err == 1, :);
+
+disp(strjoin(["The minimum error for kNN classification is ",   ...
+              num2str(min_knn_err(2)),                          ...
+              " for k = 10 and the number of neighbors being ", ...
+              num2str(min_knn_err(1))]))
+
+disp("kNN classification has been executed successfully")
 \end{minted}
 
-Afterwards, Linear Classification and kNN are estimated with their respective
-models and errors. In the case of kNN, it is also tested different k values
-previously selecty by the user. 
-It is also checked whether the model computed is better than the ones already
-modeled. It is only kept the best model.
-
-\begin{listing}
-\begin{minted}{matlab}
-        %                          ========
-        %                           LINEAR
-        %                          ========
-        
-        %                           MODEL
-        Mdl_linear = fitcecoc(trainX, trainY, 'ClassNames', ...
-                              {'setosa', 'versicolor', 'virginica'});
-        %                          TESTING
-        pred_lin = predict(Mdl_linear, testX);
-        %                           ERROR
-        err_lin = costfunction(testY, pred_lin) / length(testY);
-        
-        % Writes in log
-        fprintf(logFile,                          ...
-                ['// LINEAR \\\\\n',              ...
-                 'Model: \n',                     ...
-                 'Prediction for training: %s\n', ...
-                 'Error: %f\n'],                  ...
-                strjoin(pred_lin),                ...
-                err_lin);
-        
-        %                  MODEL ERROR COMPARISON
-        if err_lin < cell2mat(lin(2))
-            
-            % Writes in log
-            fprintf(logFile,                               ...
-                    '--> NEW BEST LINEAR MODEL %f < %f\n', ...
-                    err_lin,                               ...
-                    cell2mat(lin(2)));
-            % Saves best model data
-            lin = {[Mdl_linear]    [err_lin] ...
-                   [trainX; testX] [trainY; pred_lin]};
-        end
-        
-        % Log: extra separation
-        fprintf(logFile, '\n');
-        
-        %                           =====
-        %                            KNN
-        %                           =====
-        
-        % Writes in log 
-        for k = 1 : 1 : length(k_values)
-            
-            %                       MODEL
-            Mdl_knn = fitcknn (trainX, trainY, ...
-                               'NumNeighbors', k_values(k));
-            %                      TESTING
-            pred_knn = predict(Mdl_knn, testX);
-            %                       ERROR
-            err_knn = costfunction(testY, pred_knn) / length(testY);
-            
-            % Writes in log
-            fprintf(logFile,                          ...
-                    ['** KNN (k=%i) **\n',            ...
-                     'Model: \n',                     ...
-                     'Prediction for training: %s\n', ...
-                     'Error: %f\n'],                  ...
-                     k_values(k),                     ...
-                     strjoin(pred_knn),               ...
-                     err_knn);
-            
-            %              MODEL ERROR COMPARISON
-            if err_knn < cell2mat(knn(k, 2))
-                % Writes in log
-                fprintf(logFile,                                       ...
-                        '--> NEW BEST KNN MODEL for k=%i (%f < %f)\n', ...
-                        k_values(k),                                   ...
-                        err_lin,                                       ...
-                        cell2mat(lin(2)));
-                % Saves best model data
-                knn(k, :) = {[Mdl_knn]       [err_knn] ...
-                             [trainX; testX] [trainY; pred_lin]};
-            end
-        end
-    end
-    % ------------------------------------------------------------------- %
-\end{minted}
-\caption{Model training, testing and mean error.}
-\label{mdls}
-\end{listing}
-
-After having the best models and their respective data, it is time to
-graphically represent the results.
+Thus, after obtaining all the erros of the different parameters used for each
+model, data is plotted to get a more visual way to see the results.
 
 \begin{minted}{matlab}
-    %                             ==========
-    %                              PLOTTING
-    %                             ==========
-    
-    linX = lin(3);  linY = lin(4); 
-    linX = linX{:}; linY = linY{:}; 
-    
-    % Iris Data Graphs
-    % Rows
-    for i = 1 : 1 : 4
-        % Columns
-        for j = 1 : 1 : 8
+%                              ==========
+%                               PLOTTING
+%                              ==========
+
+disp("Plotting data")
+
+% Iris Data Graphs
+% Rows
+for i = 1 : 1 : 4
+    % Columns
+    for j = 1 : 1 : 5
+        if j <= 4
             % Location in graph
             sp = subplot(4, 8, ((i - 1) * 8 + j));
             % Diagonal             
             if mod(i, 4) ~= mod(j, 4)
-                % Linear estimations
-                if(j <= 4)
-                    % Process performed to select same color for each label
-                    for k = 1 : 1 : length(speciesStr)
-                        % Which specie should be plotted
-                        logic  = strcmp(Y, speciesStr(k));
-                        logicX = X(logic == 1, :);
-                        % Plot the selected specie
-                        scatter(logicX(:, j), logicX(:, i), ...
-                                6, colors(k), '.');
-                        hold on
-                        % Repeat process with predicted values
-                        logic  = strcmp(linY, speciesStr(k));
-                        logicX = linX(logic == 1, :);
-                        % Plot estimated labels
-                        scatter(logicX(:, j), logicX(:, i), ...
-                                10, colors(k), 'o');
-                    end
-                else                         
-                    for k = 1 : 1 : length(k_values)
-                        % Data is retrieved
-                        knnX = knn(k, :); 
-                        knnY = knnX(4); knnY = knnY{:};
-                        knnX = knnX(3); knnX = knnX{:};
-                        
-                        % Process performed to select same color for each 
-                        % label
-                        for l = 1 : 1 : length(speciesStr)
-                            % Which specie should be plotted
-                            logic  = strcmp(Y, speciesStr(l));
-                            logicX = X(logic == 1, :);
-                            % Plot the selected specie
-                            scatter(logicX(:, mod(j, 5) + 1), ...
-                                    logicX(:, i), ...
-                                    6, colors(l), '.');
-                            hold on
-                            % Repeats process with estimated values
-                            logic  = strcmp(knnY, speciesStr(l));
-                            logicX = knnX(logic == 1, :);
-                            % Plot estimated labels
-                            scatter(logicX(:, mod(j, 5) + 1), ...
-                                    logicX(:, i), ...
-                                    10 + 3 * k, colors(l), 'o');
-                        end
-                    end
-                    hold off
-                end
+                gscatter(X(:, j), X(:, i), Y, 'rgb', '.', 6);
                 % Hide legend
                 legend('off')
             else
@@ -752,17 +568,397 @@ graphically represent the results.
                         t = "Petal.Width";
                     otherwise
                 end
-                text(0.1, 0.5, t, "Parent", sp); axis off
-            end
-        end
-    end\end{minted}
 
-All models, errors, operations, \ldots are saved in the log file and printed in 
-the \textit{Command Window} for their visualization.
+                text(0.1, 0.5, t, "Parent", sp); axis off
+
+            end   
+            
+        else
+            % Linear Error
+            subplot(4, 8, [5: 8, 13 : 16]);
+            bar(lin_errs(:, 1),    lin_errs(:, 2), 'b')
+            hold on
+            bar(min_lin_err(:, 1), min_lin_err(:, 2), 'g')
+            % Title
+            title("Linear Classification Error")
+            % Labels
+            xlabel("k-value")
+            ylabel("Error")
+            
+            % kNN Error
+            subplot(4, 8, [21: 24, 29 : 32]);
+            bar(knn_errs(:, 1),    knn_errs(:, 2), 'b')
+            hold on
+            bar(min_knn_err(:, 1), min_knn_err(:, 2), 'g')
+            % Title
+            title("kNN Classification Error")
+            % Labels
+            xlabel("Num neightbors")
+            ylabel("Error")
+            
+        end 
+    end
+end
+\end{minted}
+
+Now it is time to see the guts of the first classification method, linear
+classification. To avoid using too many parameters, and as the example developed
+has a very focused scope, the data is load again inside the function (although
+it is not usually a good practice, it has been a choice in the design to ease
+the developers workload).
+
+The process after loading the data is fairly simple. The log file that is going
+to engrave every operation is initialized. Then, the model, prediction and error
+of the aforementioned operations, are computed with the training data of the
+chunk selected by the k-fold crossvalidation (this process is repeated as many
+times as the k-fold algorithm stipulates. Finally, the average error of the
+model, applying k-folding, is returned.
 
 \begin{minted}{matlab}
-fclose(logFile);
-type experiments.log
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% COURSEWORK 1: EXPERIMENTAL COMPARISON OF K-NN AND LINEAR CLASSIFICATION
+% ON THE IRIS DATA-SET
+% AUTHOR: PABLO ACEREDA
+% FILE:   LINEAR_CLASSIFICATION.M
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function lin_avg_err = linear_classification(kDiv, filename)
+
+    %                              LOAD DATA
+    %                             ===========
+    load fisheriris meas species
+
+    %                                DATA 
+    %                               ======
+
+    % Want to order samples randomly to apply cross-validation
+    P = randperm(length(species));
+
+    % Data from flower (all in cm):
+    % { Sepal length | Sepal width | Petal length | Petal width }
+    X = meas(P, :);
+
+    % Class label:
+    % - Setosa
+    % - Versicolor
+    % - Virginica
+    Y = species(P);
+
+    %                     DATA PARTITIONING INFORMATION
+    %                    ===============================
+
+    N    = length(species);
+    jump = floor(N / kDiv);
+
+    %                          LOG FILE CREATION
+    %                         ===================
+
+    % Moves path to file's path
+    cd(fileparts(mfilename('fullpath')));
+
+    % Creates file in case it does not existe
+    filename = strcat("logs/linearlog/", filename);
+    logFile = fopen(filename, 'w');
+
+    % Writes in log file
+    fprintf(logFile,                                           ...
+            ['INFO: ',                                         ...
+             '==== NEW EXPERIMENT ====\n',                     ...
+             'INFO: ',                                         ...
+             'Data is going to be divided into %i pieces.\n'], ...
+            kDiv);
+
+    % Valid number of divisions
+    if kDiv < N
+
+        % Write into log
+        fprintf(logFile,                             ...
+                ['INFO: ',                           ...
+                 'The value for k is valid ',        ...
+                 '(k[%i] < number of samples[%i]) ', ...
+                 '-> VALID.\n'],                     ...
+                kDiv,                                ...
+                N);
+
+        %                            VARIABLES
+        %                           ===========
+
+        % Column1: Error
+        % Column2: Meas
+        % Column3: Species Predicted
+        % Column4: Species Labeled
+        lin = cell(length(kDiv), 4);
+        lin(:, 2) = {[100]};
+
+        %                            ========
+        %                             K-FOLD
+        %                            ========
+
+        for i = 1 : 1 : kDiv
+
+            % Writes in log
+            fprintf(logFile,                     ...
+                    '\n-- K-FOLD: %i/%i --\n\n', ...
+                    i,                           ...
+                    kDiv);
+
+            if     i == 1
+
+                testX  = X(       1 : jump, :);
+                testY  = Y(       1 : jump, :);
+                trainX = X(jump + 1 : end,  :);
+                trainY = Y(jump + 1 : end,  :);
+
+            elseif i * jump <= N && i < kDiv 
+
+                testX  = X((i - 1) * jump + 1 : i * jump, :);
+                testY  = Y((i - 1) * jump + 1 : i * jump, :);
+                trainX = [X(1 : (i - 1) * jump, :) ; ...
+                          X(i * jump + 1: end, :)];
+                trainY = [Y(1 : (i - 1) * jump, :) ; ...
+                          Y(i * jump + 1: end, :)];
+
+            else
+
+                testX  = X((i - 1) * jump + 1 : end, :);
+                testY  = Y((i - 1) * jump + 1 : end, :);
+                trainX = X(1                  : (i - 1) * jump     , :);
+                trainY = Y(1                  : (i - 1) * jump     , :);
+
+            end
+
+            %                         ========
+            %                          LINEAR
+            %                         ========
+
+            %                           MODEL
+            Mdl_linear = fitcecoc(trainX, trainY, ...
+                                  'ClassNames', ["setosa",     ...
+                                                 "versicolor", ...
+                                                 "virginica"]);
+            %                          TESTING
+            pred_lin = predict(Mdl_linear, testX);
+            %                           ERROR
+            err_lin = costfunction(testY, pred_lin) / length(testY);
+
+            % Writes in log
+            fprintf(logFile,                          ...
+                    ['// LINEAR \\\\\n',              ...
+                     'Prediction for training: %s\n', ...
+                     'Actual values:           %s\n', ...
+                     'Error: %f\n'],                  ...
+                    strjoin(pred_lin),                ...
+                    strjoin(testY),                   ...
+                    err_lin);
+
+            %                      ERROR STORAGE
+            lin(i, :) = {[err_lin] [trainX] [pred_lin] [testY]};
+
+            % Log: extra separation
+            fprintf(logFile, '\n');
+
+        end
+    % ------------------------------------------------------------------- %
+
+        lin_avg_err = sum(cell2mat(lin(:, 1))) / length(lin);
+
+        fprintf(logFile,                                                ...
+                ['\n===============================================\n', ...
+                'Linear Mean Error: %f'],                               ...
+                lin_avg_err);
+
+    else
+        fprintf(logFile,                             ...
+                ['ERROR: ',                          ...
+                 'The value for k is too large ',    ...
+                 '(k[%i] < number of samples[%i]) ', ...
+                 '-> VALID.\n'],                     ...
+                kDiv,                                ...
+                N);
+    end
+
+    % Writes everything in log
+    fclose(logFile);
+
+    lin_avg_err;
+
+end
+\end{minted}
+
+The aforementioned pattern is repeated once again for the kNN classification,
+this time in a separeted function.
+
+\begin{minted}{matlab}
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% COURSEWORK 1: EXPERIMENTAL COMPARISON OF K-NN AND LINEAR CLASSIFICATION
+% ON THE IRIS DATA-SET
+% AUTHOR: PABLO ACEREDA
+% FILE:   KNN_CLASSIFICATION.M
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function knn_avg_err = knn_classification(kDiv, k_value, filename)
+
+    %                              LOAD DATA
+    %                             ===========
+    load fisheriris meas species 
+
+    %                                DATA 
+    %                               ======
+
+    % Want to order samples randomly to apply cross-validation
+    P = randperm(length(species));
+
+    % Data from flower (all in cm):
+    % { Sepal length | Sepal width | Petal length | Petal width }
+    X = meas(P, :);
+
+    % Class label:
+    % - Setosa
+    % - Versicolor
+    % - Virginica
+    Y = species(P);
+
+    %                     DATA PARTITIONING INFORMATION
+    %                    ===============================
+
+    N    = length(species);
+    jump = floor(N / kDiv);
+
+    %                          LOG FILE CREATION
+    %                         ===================
+
+    % Moves path to file's path
+    cd(fileparts(mfilename('fullpath')));
+
+    % Creates file in case it does not existe
+    filename = strcat("logs/knnlog/", filename);
+    % Open file 
+    logFile = fopen(filename, 'w');
+
+    % Writes in log file
+    fprintf(logFile,                                           ...
+            ['INFO: ',                                         ...
+             '==== NEW EXPERIMENT ====\n',                     ...
+             'INFO: ',                                         ...
+             'Data is going to be divided into %i pieces.\n'], ...
+            kDiv);
+
+    % Valid number of divisions
+    if kDiv <= N
+
+        % Write into log
+        fprintf(logFile,                             ...
+                ['INFO: ',                           ...
+                 'The value for k is valid ',        ...
+                 '(k[%i] < number of samples[%i]) ', ...
+                 '-> VALID.\n'],                     ...
+                kDiv,                                ...
+                N);
+
+        %                            VARIABLES
+        %                           ===========
+
+        % Column1: Error
+        % Column2: Meas
+        % Column3: Species Predicted
+        % Column4: Species Labeled
+        knn = cell(length(kDiv), 4);
+        knn(:, 2) = {[100]};
+
+        %                            ========
+        %                             K-FOLD
+        %                            ========
+
+        for i = 1 : 1 : kDiv
+
+            % Writes in log
+            fprintf(logFile,                     ...
+                    '\n-- K-FOLD: %i/%i --\n\n', ...
+                    i,                           ...
+                    kDiv);
+
+            if     i == 1
+
+                testX  = X(       1 : jump, :);
+                testY  = Y(       1 : jump, :);
+                trainX = X(jump + 1 : end,  :);
+                trainY = Y(jump + 1 : end,  :);
+
+            elseif i * jump <= N && i < kDiv 
+
+                testX  = X((i - 1) * jump + 1 : i * jump, :);
+                testY  = Y((i - 1) * jump + 1 : i * jump, :);
+                trainX = [X(1 : (i - 1) * jump, :); ...
+                          X(i * jump + 1: end, :)];
+                trainY = [Y(1 : (i - 1) * jump, :); ...
+                          Y(i * jump + 1: end, :)];
+
+            else
+
+                testX  = X((i - 1) * jump + 1 : end, :);
+                testY  = Y((i - 1) * jump + 1 : end, :);
+                trainX = X(1                  : (i - 1) * jump     , :);
+                trainY = Y(1                  : (i - 1) * jump     , :);
+
+            end
+
+            %                          =====
+            %                           KNN
+            %                          =====
+
+            %                          MODEL
+            Mdl_knn = fitcknn (trainX, trainY, 'NumNeighbors', k_value);
+            %                         TESTING
+            pred_knn = predict(Mdl_knn, testX);
+            %                          ERROR
+            err_knn = costfunction(testY, pred_knn) / length(testY);
+
+            % Writes in log
+            fprintf(logFile,                          ...
+                    ['** KNN (k=%i) **\n',            ...
+                     'Prediction for training: %s\n', ...
+                     'Actual values:           %s\n', ...
+                     'Error: %f\n'],                  ...
+                      k_value,                        ...
+                      strjoin(pred_knn),              ...
+                      strjoin(testY),                 ...
+                      err_knn);
+
+            %                      ERROR STORAGE
+            knn(i, :) = {[err_knn] [trainX] [pred_knn] [testY]};
+
+            % Log: extra separation
+            fprintf(logFile, '\n');
+        end
+    % ------------------------------------------------------------------- %
+
+        knn_avg_err = sum(cell2mat(knn(:, 1))) / length(knn);
+
+        fprintf(logFile,                                                ...
+                ['\n===============================================\n', ...
+                'kNN Mean Error: %f'],                                  ...
+                knn_avg_err);
+
+    else
+        fprintf(logFile,                             ...
+                ['ERROR: ',                          ...
+                 'The value for k is too large ',    ...
+                 '(k[%i] < number of samples[%i]) ', ...
+                 '-> VALID.\n'],                     ...
+                kDiv,                                ...
+                N);
+    end
+
+    % Writes everything in log
+    fclose(logFile);
+    
+    knn_avg_err;
+
+end
 \end{minted}
 
 Finally, the cost function implemented to compute the mean error of the
