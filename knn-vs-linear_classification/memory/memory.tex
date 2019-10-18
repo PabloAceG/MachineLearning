@@ -56,7 +56,7 @@
 % %                                  TITLE                                     %
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{Courseworkv 1: Experimental Comparison of k-NN and Linear Classification
+\title{Coursework 1: Experimental Comparison of k-NN and Linear Classification
 on the Iris data-set}
 
 \author{
@@ -76,7 +76,7 @@ Acereda García, Pablo\\
 \newpage
 \vspace*{\fill}
  \begin{center}
-This page has been left blank intentionally
+This page has been intentionally left blank
  \end{center}
 \vspace*{\fill}
 \newpage
@@ -91,16 +91,15 @@ This page has been left blank intentionally
 %                            %%%%%%%%%%%%%%
 \section{Introduction - Machine Learning and Classification Problems}
 
-Machine learning, is a field of study which is on the search for predictions
-towards a certain given input. But the input does not automatically transform
-into the right answer, by divine intervention. But as a science worthy of its
-name, it relies on mathematical models which are the result of using statistical
-models and artificial intelligence (AI).
+Machine learning is the field of study focused on the creation of models to
+formulate the answer in regards to a given input. The transformation from a
+chaotic input to the desired output takes place by using statistical models and
+other fields of study like artificial intelligence (AI).
 
-The process of transformation of a certain input, or training data; to the
+The process of transformation of a certain input, or training data, to the
 desired output, is known as classification problem.
 
-In this process, there can be identified three main categories: 
+In this process, three main categories can be identified: 
 \textit{supervised learning}, \textit{unsupervised learning} and
 \textit{reinforcement learning}.
 
@@ -112,46 +111,35 @@ In this process, there can be identified three main categories:
  
  \item [Unsupervised Learning] In this case, no data is labeled. On the 
   contrary, unsupervised search helps finding clusters in data (and therefore 
-  labelling them) or to find correlation in sets of possibly correlated 
-  observations.
+  labelling them) and correlations in sets of possibly correlated observations.
 
  \item [Reinforcement Learning] The objective of these algorithms is to maximize
-  some notion of cumulative reward, given a certain enviroment and deciding
-  which actions should take a software agent\footnote{''Computer program that
+  some notion of cumulative reward, given a certain environment and deciding
+  which actions a software agent should take\footnote{''Computer program that
   acts for a user or other program.''}.
 
 \end{description}
 
 The scope of this assignment is not to delve into unsupervised learning; nor is
 to go into detail about reinforcement learning (which has not even been 
-mentioned in the lectures so far).
-
-In the following sections of the project, it is going to be discussed about the
-dataset used; give a description of the algorithms exploited; and comment how
-those models are applied to the given dataset.
+mentioned in the lectures so far); but to give a description of the implemented
+algorithms, the dataset used and to see how those models are applied to the
+given dataset.
 
 %                                 DATASET
 %                                =========
 \subsection{Dataset - Iris Dataset}
 
 Also known as \textit{Iris flower data set} or \textit{Fisher's Iris data set}
-(name given after Ronald Fishers, who used the dataset in his publication in 
-1936); is a dataset formed by three flowers from the same species: \textbf{Iris 
-flowers}.
+\footnote{Name given after Ronald Fishers, who used the dataset in his 
+publication in 1936}; is a dataset formed by three flowers from the same 
+species: \textbf{Iris flowers}.
 
 According to the original paper, \textit{``All three species were collected in
 the Gaspé Peninsula, from the same pasture, picked on the same day and measured
 at the same time by the same person with the same apparatus''}.
 
 The three species that the original paper talks about are:
-
-\begin{easylist}[itemize]
- 
-  & Iris Versicolor
-  & Iris Setosa
-  & Iris Virginica
-
-\end{easylist}
 
 \begin{figure}[H]
  \centering
@@ -172,7 +160,7 @@ The three species that the original paper talks about are:
 
 There were measured the characteristics of 50 flowers from each particular
 specie; taking into account the length and the width from sepals and petals. The
-unit of measure used was centimiters (cm).
+measure unit used for this experiment was centimeters (cm).
 
 \begin{figure}[h]
  \centering
@@ -183,7 +171,7 @@ unit of measure used was centimiters (cm).
 
 In this specific project, the Iris Dataset has been used to train and test kNN
 and linear classification, randomly ordering the samples to later apply
-cross-valitadion method k-fold.
+cross-validation method k-fold.
 
 %                                 MODELS
 %                                ========
@@ -192,11 +180,11 @@ cross-valitadion method k-fold.
 %                            ===== KNN =====
 \subsubsection{K-Nearest-Neighbors}
 
-To classify a new input, by checking which are the closest neighbors; that is
-the scope this classification method uses. It is possible to understand how it
-works at a glance, when the model is trained by labeled data, it can predict the
-class/specie/category of the sample just by computing the k-nearest neighbours;
-using the \textit{euclidean distance}.
+The model kNN has as its objective to classify new inputs by looking at the
+\textit{k} closest neighbors. It is possible to understand how it works at a 
+glance, when the model is trained by labeled data, it can predict the
+class/specie/category of a new sample just by computing the k-nearest neighbors.
+That is achieved by using the \textit{Euclidean distance}.
 
 For two dimensions, the formula goes as follows:
 
@@ -224,19 +212,19 @@ A very important argument, or list of arguments, which can be specified after
 any of the aforementioned variables is the \textit{Name-Value} Pair Arguments.
 They allow to edit properties like what breaks ties in case several samples have
 the same properties; the value for k (how many neighbors are selected to decide
-the specie), \ldots
+the specie), etc.
 
 %                     ===== LINEAR CLASSIFICATION =====
 \subsubsection{Linear Classification}
 
 There are actually 2 models which create a linear classification:
-\textit{fitclinear} and \textit{fitcecoc}. As the first of the does not allow
-multiclass models such the needed for Iris Dataset, that is the one to be
-described in this section.
+\textit{fitclinear} and \textit{fitcecoc}. But, as the first of them does not 
+allow multiclass models, - i.e., the one needed for Iris Dataset. Thus, the 
+second model is the one being described in this section.
 
 In any case, they both use linear equations to ``separate'' the points from each
-specie. If a given sample is in the area of a certain specie, the model decides
-it belongs to that same specie.
+species. If a given sample is in the area of a certain species, the model 
+decides it belongs to that same class.
 
 \begin{equation}
  \centering
@@ -251,12 +239,10 @@ it belongs to that same specie.
  [Mdl, HyperparameterOptimizationResults] = fitcecoc(__)
 \end{minted}
 
-At first sight it can be seen that both linear and kNN classification have very
-similar parameters.
-
-The diference can be found for eample in the pair of arguments
-\textit{Name-Value}. Can modify the behaviour of the binary learners, design
-partitions, \ldots
+At first sight, both linear and kNN classification have very similar parameters.
+The difference can be found, for example, in the pair of arguments
+\textit{Name-Value}; which can modify the behaviour of the binary learners, 
+design partitions, etc.
 
 There is also one more variable, \textit{HyperparameterOptimizationResults},
 which is the description of the cross-validation optimization of
@@ -267,17 +253,17 @@ implemented manually.
 %                               =============
 \subsection{Application - Models to Dataset}
 
-All these theory is very accurate, and also compelling but, how is this going to
-help with the Iris Dataset? Fairly simple, by implementin.g a k-fold
-crossvalidation which will allow to know the accuracy of the models for the
+All this theory is very accurate, and also compelling but, how is this going to
+help with the Iris Dataset? Fairly simple, by implementing a k-fold
+cross-validation which will allow to know the accuracy of the models for the
 given data.
 
-With kNN, the more neighbors that are from the same specie, the more chances
-that input has to be from that specie. Varying the significant number of
+With kNN, the more neighbors that are from the same species, the more chances
+that input has to be from that species. Varying the significant number of
 neighbors, specified by k might also be helpful when it comes to accuracy.
 
 On the other hand, linear classification uses multiclass linear equations to
-predict if the given new sample is from one specie or not. In this case, no
+predict if the given new sample is from one species or not. In this case, no
 parameters have been changed.
 
 %                           %%%%%%%%%%%%%%%%%%%
@@ -290,55 +276,53 @@ statistical methods and algorithms in order to predict new samples from the
 species \textit{Iris Versicolor}, \textit{Iris Setosa} and \textit{Iris
 Virginica}.
 
-To make it more bearable, the structure of the program could be simplified as
-follows:
+The final structure of the algorithm is summarized by the following key points.
 
 \begin{easylist}[enumerate]
  
-  & K-fold implementation. Henceforth, Data must me splitted in k same-sized
-  pieces. 
+  & K-fold implementation. Data must me split in k same-sized pieces. Iterating
+  on each piece for testing data, and the remaining data used for training.
   
   & Model generation on training data from \textit{Iris Dataset}, previously
   separated by k-fold: \textbf{fitcknn} and \textbf{fitcecoc}.
 
   & Test models by predicting labels from testing data.
 
-  & Compute error based on the predicted labels and their actual values.
+  & Computed error based on the predicted labels and their actual values.
 
-  & Compute the average of all the errors obtained in each iteration performed 
-  by the k-fold crossvalidation.
+  & Computed the average of all the errors obtained in each iteration performed 
+  by the k-fold cross-validation.
 
   & Data visualization.
 
 \end{easylist}
 
-%                              CROSSVALIDATION
+%                              CROSS-VALIDATION
 %                             =================
-\subsection{Crossvalidation - K-fold}
+\subsection{Cross-validation - K-fold}
 
-As it has been mention before, it has been implemented crossvalidation using
-k-folding. It works by splitting data in k same-sized parts, and iterating
-through them, so every chunck of data is being used for training and for
-testing.
+It works by splitting data in k same-sized parts, and iterating through them, 
+so every chunk of data is being used for training and for testing. The models
+are trained \textit{k} times, so at the end of the cross-validation it is
+computed the average of the error computed in each iteration. A new model
+trained with all the samples, should have that average error.
 
 \begin{figure}[h]
  \centering
  \includegraphics[width=0.75\textwidth]{../diagrams/kfold.png}
- \caption{K-fold crossvalidation.}
+ \caption{K-fold cross-validation.}
 \end{figure}
 
 \subsection{Modeling and Testing - fitcknn and fitcecoc}
 
 The complexity of this procedure is not inherently very high; once data has been
-separated into chunks from the same size, it is just needed to specify certain
+separated into chunks from the same size, it is only required to specify certain
 parameters at most.
-
-It is not needed any forward step to obtain and test the models.
 
 \subsection{Error - Cost Function}
 
-The implementation chosen for this problem is not other than the Mean Error
-(ME - \hyperref[me]{\ref{me}}).
+The implementation for the problem is the statistical function for the Mean 
+Error (ME - \hyperref[me]{\ref{me}}).
 
 \begin{equation}
  \centering
@@ -357,14 +341,14 @@ taking the Mean Squared Error (MSE - \hyperref[mse]{\ref{mse}}):
  \frac{1}{N} \sum_{i=1}^{N} {I(a, b)^2} \label{mse}
 \end{equation}
 
-To square something which has a binary value, 0 or 1\footnote{Should be taken
-into accout that the predicted label for the sample data can only be right or
+To squaring something which has a binary value, 0 or 1\footnote{Should be taken
+into account that the predicted label for the sample data can only be right or
 wrong}, would actually result in the same value. 
 
-Same happens with the Root Mean Squared Error (RMSE - 
-\hyperref[rmse]{\ref{rmse}}), only in this case it would be with the square root 
-of the same result that would be obtained with ME (Equation 
-\hyperref[me]{\ref{me}}) but in this case proportional to the square root. 
+The same thing happens with the Root Mean Squared Error (RMSE - 
+\hyperref[rmse]{\ref{rmse}}), only in this case, it would be with the square 
+root of the same result that would be obtained with ME (Equation 
+\hyperref[me]{\ref{me}}), but in this case proportional to the square root. 
 Which, at least for the scope of this project is not really necessary.
 
 \begin{equation}
@@ -372,40 +356,52 @@ Which, at least for the scope of this project is not really necessary.
 \end{equation}
 
 There is another function already implemented in MATLAB called 
-\textbf{resubLoss}, but uses weights in the model and other parameters that are
-not available, albeit it is more accurate, it cannot be implemented.
+\textbf{resubLoss}, but it uses weights in the model and other parameters that 
+are not available, although it is more accurate, it cannot be implemented with
+the known data.
 
 \section{Conclusion}
 
-In brief, it has been used two different classification models. It has also been
-used k-fold crossvalidation to find the error rate of each model.
+In brief, two different classification models have been used. Also,
+the k-fold cross-validation implementation allows to find the average error rate
+of each model.
 
-Looking at the results, it can be observed that the most suitable value for
-k-fold in linear classification is surprisingly, 100 (after repeating the
-program 20 times). The values for k have been changed from 10 to 100 taking 
-steps of 10 at a time. This might make sense; when data is divided into 100 
-different pieces, the testing chunks are formed by two elements, which rarely 
-gives an error rate higher than 0.
+Looking at the results, the most suitable value for k-fold can be observed: 
+surprisingly, it is 100 (after repeating the program execution 20 times). 
+The values for k have been changed from 10 to 100 taking steps of 10 at a time. 
+Looking at the division scheme, it makes absolute sense; if data is divided into 
+100 different pieces, the testing chunks are formed by two elements, which 
+rarely gives an error rate higher than 0.
 
 On the other hand, in kNN the value for k in k-fold has been fixed to 10,
 changing instead the number of neighbors (from 1 to 150). After looking at 
 different executions (once again, 20 runs), the most suitable number of 
 neighbors seems to be 17.
 
-The writer of the article has the beliefs that the selection of the
-classification method depends on the number of samples in the model mainly: if
-the number of samples is too large, kNN classification takes too much time to
-label new elements. On the other hand, if resources and time are not that
-important, linear classification would mean the loss of classification accuracy
-for most cases (kNN looses accuracy after the number of neighbors reaches 80,
-error rate goes through the roof).
+The writer has the belief that the selection of the classification method 
+depends mainly on the number of samples in the model: if the number of samples 
+is too large, kNN classification takes too much time to label new elements. 
+On the other hand, if resources and time are not that important, linear 
+classification would mean the loss of classification accuracy for most cases 
+(kNN looses accuracy after the number of neighbors reaches 80, error rate
+escalates).
+
+Finally, the results of the experiment are shown in the next figure
+\hyperref[exp]{\ref{exp}}:
+
+\begin{figure}[h]
+ \centering
+ \includegraphics[width=0.7\textwidth]{../experiments/estimation.jpg}
+ \caption{To see more experiments go to folder ``./experiments/''.}
+ \label{exp}
+\end{figure}
 
 \newpage
 
 \section*{Appendix: Code}
 
 The code has been developed in MATLAB. It has been separated in different
-chuncks regarding the behaviour of each block.
+chunks separating the models implementations and the experiment itself.
 
 \begin{figure}[h]
  \centering
@@ -413,13 +409,12 @@ chuncks regarding the behaviour of each block.
  \caption{Structure of the program - Call Graph.}
 \end{figure}
 
-As any respected MATLAB implementation, first of all is needed to have a clean
-enviroment:
+A good practice for a MATLAB script is to have a clean environment.
 
 \begin{minted}{matlab}
 % clear variables
 % close opened windows
-% clean the comand windows
+% clean the command windows
 %-------------------------------------------------------------------------%
 clear variables;
 close all;
@@ -428,7 +423,7 @@ clc;
 \end{minted}
 
 Afterwards, data is loaded, also creating the folders used for the log files (in
-case they do not exists).
+case they do not exist).
 
 \begin{minted}{matlab}
 %                              LOAD DATA
@@ -470,9 +465,9 @@ end
 Afterwards, the functions that perform the linear and the kNN classification are
 called: in the case of linear classification, the values for k-folding are
 changed as an experiment; in the case of kNN classification, all the possible 
-number of neighbors are tested to find the optimal. As the time consumed to
-perform all the operations can be long, there are printed some debbuging
-messages to make sure the program has not crushed.
+number of neighbors are tested to find the optimal. All these operations are
+very time consuming, so some debugging messages are printed (to be aware of the
+state of the execution).
 
 \begin{minted}{matlab}
 %                                 LINEAR
@@ -533,7 +528,7 @@ disp(strjoin(["The minimum error for kNN classification is ",   ...
 disp("kNN classification has been executed successfully")
 \end{minted}
 
-Thus, after obtaining all the erros of the different parameters used for each
+Thus, after obtaining all the errors of the different parameters used for each
 model, data is plotted to get a more visual way to see the results.
 
 \begin{minted}{matlab}
@@ -601,14 +596,13 @@ for i = 1 : 1 : 4
 end
 \end{minted}
 
-Now it is time to see the guts of the first classification method, linear
-classification. To avoid using too many parameters, and as the example developed
-has a very focused scope, the data is load again inside the function (although
-it is not usually a good practice, it has been a choice in the design to ease
-the developers workload).
+In the first classification method, linear classification, it has been tried to 
+avoid using too many parameters. As the example developed has a very focused 
+scope, the data is loaded again inside the function (although it is not usually 
+a good practice, it still is a design choice to ease the developer's workload).
 
 The process after loading the data is fairly simple. The log file that is going
-to engrave every operation is initialized. Then, the model, prediction and error
+to store every operation is initialized. Then, the model, prediction and error
 of the aforementioned operations, are computed with the training data of the
 chunk selected by the k-fold crossvalidation (this process is repeated as many
 times as the k-fold algorithm stipulates. Finally, the average error of the
@@ -788,7 +782,7 @@ end
 \end{minted}
 
 The aforementioned pattern is repeated once again for the kNN classification,
-this time in a separeted function.
+this time in a separated function.
 
 \begin{minted}{matlab}
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
