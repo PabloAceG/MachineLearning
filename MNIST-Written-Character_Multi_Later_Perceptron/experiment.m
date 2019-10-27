@@ -28,8 +28,7 @@ labels = [loadMNISTLabels('./dataset/train-labels.idx1-ubyte');
           loadMNISTLabels('./dataset/t10k-labels.idx1-ubyte')];
 
 % We are using display_network from the autoencoder code
-%display_network(images(:,1:100)); % Show the first 100 images
-%disp(labels(1:10));
+display_network(images(:,1:100)); % Show the first 100 images
+disp(labels(1:10));
 
-crossValidationSet(images, labels, 10)
-
+[train, test] = crossValidationSet(images, labels, 10);
