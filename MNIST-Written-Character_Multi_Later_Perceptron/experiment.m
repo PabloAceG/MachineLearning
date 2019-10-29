@@ -38,18 +38,16 @@ labels = [loadMNISTLabels('./dataset/train-labels.idx1-ubyte');
 
 %                       NEURAL NETWORK TRAINING
 %                      =========================
-% Trainig using k-fold
-k_value = 10;
 
+% Size of the output layer (from 0 to 9)
+sizeOutputLayer = 10;
+% Number of Neurons Per Layer
+numberNeuronsLayer = [size(images, 1), 10, 10, sizeOutputLayer];
 % Number of layers
-numLayers = 3;
+numLayers = length(numberNeuronsLayer) - 1;
 
-% Data division
-[train, test] = crossValidationSet(images, labels, k_value);
-
-numberLayers = 3;
-numberNeuronsLayer = [size(images, 1), 10, 10, 10];
-Weights = cell(numberLayers, 1);
+% Weights initialization
+Weights = cell(numLayers, 1);
 
 for i = 2 : length(numberNeuronsLayer)
        w = rand(numberNeuronsLayer(i), ...
@@ -58,29 +56,12 @@ for i = 2 : length(numberNeuronsLayer)
 
 end
 
-% Cross validations
-for i = 1 : k_value
-    % Training and Testing sets for iteration
-    setTrainImage = cell2mat(train(i, 1));
-    setTrainLabel = cell2mat(train(i, 2));
-    setTestImage  = cell2mat(test (i, 1));
-    setTestLabel  = cell2mat(test (i, 2));
-    
-    for j = 1 : 10%length(labels)
-        input = [setTrainImage(:, j); 1];
-        
-        % Number of layers
-        for k = 1 : numLayers
-            input = [layerActivation(cell2mat(Weights(k)), ...
-                                    input,                 ...
-                                    'perceptron');         ...
-                     1];
-        end
+% Trainig using k-fold
+k_value = 10;
 
-        % Error
-        label = setTrainLabel(j);
-    end
-end
+%                           CROSS VALIDATION 
+%                          ==================
+crossValidationTraining(Weights, images, labels, 'perceptron', k_value);
 
-"I'm done"
+"I'm done, no errors"
 

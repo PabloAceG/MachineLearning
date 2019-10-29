@@ -1,4 +1,4 @@
-function o = layerActivation(weights, inputs, fun)
+function [o, a] = layerActivation(weights, inputs, fun)
     % Neuron activation
     a = weights * inputs;
     
@@ -13,4 +13,6 @@ function o = layerActivation(weights, inputs, fun)
         otherwise
             o = perceptron(a);
     end
+    
+    o = [o; ones(1, size(o, 2))];
 end
