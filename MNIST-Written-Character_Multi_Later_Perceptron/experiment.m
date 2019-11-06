@@ -43,11 +43,12 @@ labels = [loadMNISTLabels('./dataset/train-labels.idx1-ubyte');
 sizeOutputLayer = 10;
 % Number of Neurons Per Layer
 numberNeuronsLayer = [size(images, 1), 10, sizeOutputLayer];
-% Number of layers
-numLayers = length(numberNeuronsLayer) - 1;
+% Number of layers. Output and Input layers as counted as layers
+numLayers = length(numberNeuronsLayer);
 
 % Weights initialization
-Weights = cell(numLayers, 1);
+% Output layer does not have weights
+Weights = cell(numLayers - 1, 1);
 
 for i = 2 : length(numberNeuronsLayer)
        w = rand(numberNeuronsLayer(i), ...

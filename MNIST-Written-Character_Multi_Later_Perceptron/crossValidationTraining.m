@@ -7,9 +7,11 @@ function [] = crossValidationTraining(W,               ...
     %                         ===============
     [train, test] = crossValidationSet(samples, labels, k_value);
     
-    numLayers = length(W);
+    % Output layer, despite not having weights attached after itself, is a
+    % layer nontheless
+    numLayers = length(W) + 1;
     sizeOutputLayer = size(cell2mat(W(end)), 1);
-
+    
     % Cross validations
     for i = 1 : k_value
         % Training and Testing sets for iteration
@@ -20,21 +22,21 @@ function [] = crossValidationTraining(W,               ...
         
         % Data obtained after processing each layer
         % Output of each layer
-        outputs     = cell(numLayers, 1);
-        % Cells activation per layer.
-        activations = cell(numLayers, 1);
+        outputs = cell(numLayers, 1);
 
         for j = 1 : 10%length(labels)
-            o = setTrainImage(:, j);
-
-            % Number of layers
-            for k = 1 : numLayers
+            % Input layer outputs
+            o          = setTrainImage(:, j);
+            outputs(1) = mat2cell(o, size(o, 1), size(o, 2));
+            
+            % Iterates through layers, except for the output layer
+            
+            for k = 1 : numLayers - 1
                 
-                [o, a] = layerActivation(cell2mat(W(k)), ...
-                                         [o; 1],         ...
-                                         trainFunction);
-                outputs(k)     = mat2cell(o, size(o, 1), size(o, 2));
-                activations(k) = mat2cell(a, size(a, 1), size(a, 2));
+                o = layerActivation(cell2mat(W(k)), ...
+                                    [o; 1],         ...
+                                    trainFunction);
+                outputs(k + 1) = mat2cell(o, size(o, 1), size(o, 2));
             end
 
             W = gradientDescentUpdate(outputs,          ...
@@ -49,7 +51,3 @@ end
 
 % TODO: 
 % - Delete 10 and substitute by number of labels in j loop
-% - activations might no be needed. Delete from:
-% - Set learning rate gradientDescentUpdate(_,_,_, X)
-%   -- this file
-%   -- layerActivation.m

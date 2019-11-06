@@ -1,11 +1,11 @@
 % Params:
-%   W - Layer Weight
-%   v - Layer Input Vector (previous layer outputs 
-%                           + extra row with value 1)
+%   W   - Layer Weight
+%   v   - Layer Input Vector (previous layer outputs 
+%                             + extra row with value 1)
+%   fun - Function to be executed
 % Returns:
-%   o - Layer Output       (column)
-%   a - Neurons activation (row)
-function [o, a] = layerActivation(W, v, fun)
+%   o - Layer Output (column)
+function o = layerActivation(W, v, fun)
     % Neuron activation
     a = W * v;
     
