@@ -1,4 +1,4 @@
-function [] = crossValidationTraining(w,               ...
+function [] = crossValidationTraining(W,               ...
                                       samples, labels, ...
                                       trainFunction,   ...
                                       k_value)
@@ -7,41 +7,49 @@ function [] = crossValidationTraining(w,               ...
     %                         ===============
     [train, test] = crossValidationSet(samples, labels, k_value);
     
-    numLayers = length(w);
-    sizeOutputLayer = size(cell2mat(w(end)), 1);
+    numLayers = length(W);
+    sizeOutputLayer = size(cell2mat(W(end)), 1);
 
     % Cross validations
     for i = 1 : k_value
         % Training and Testing sets for iteration
-        setTrainImage = [cell2mat(train(i, 1)); ...
-                         ones(1, size(cell2mat(train(i, 1)), 2))];
+        setTrainImage = cell2mat(train(i, 1));
         setTrainLabel = cell2mat(train(i, 2));
         setTestImage  = cell2mat(test (i, 1));
         setTestLabel  = cell2mat(test (i, 2));
+        
+        % Data obtained after processing each layer
+        % Output of each layer
+        outputs     = cell(numLayers, 1);
+        % Cells activation per layer.
+        activations = cell(numLayers, 1);
 
         for j = 1 : 10%length(labels)
-            input = setTrainImage(:, j);
-
-            % Cells activation per layer.
-            cellsAct = cell(numLayers, 1);
+            o = setTrainImage(:, j);
 
             % Number of layers
             for k = 1 : numLayers
-
-                [input, cellsAct] = layerActivation(cell2mat(w(k)), ...
-                                                    input,          ...
-                                                    trainFunction);
+                
+                [o, a] = layerActivation(cell2mat(W(k)), ...
+                                         [o; 1],         ...
+                                         trainFunction);
+                outputs(k)     = mat2cell(o, size(o, 1), size(o, 2));
+                activations(k) = mat2cell(a, size(a, 1), size(a, 2));
             end
 
-            % Prediction made by neural network.
-            estimation = input(1 : end - 1);
-            % Desired output for given input (correct value of prediction).
-            desired = zeros(sizeOutputLayer, 1);
-            desired(setTrainLabel(j) + 1) = 1;
-
-            error = estimation - desired;
+            W = gradientDescentUpdate(outputs,          ...
+                                      W,                ...
+                                      setTrainLabel(j), ...
+                                      0);
 
         end
     end
 
 end
+
+% TODO: 
+% - Delete 10 and substitute by number of labels in j loop
+% - activations might no be needed. Delete from:
+% - Set learning rate gradientDescentUpdate(_,_,_, X)
+%   -- this file
+%   -- layerActivation.m

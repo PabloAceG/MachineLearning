@@ -1,18 +1,23 @@
-function [o, a] = layerActivation(weights, inputs, fun)
+% Params:
+%   W - Layer Weight
+%   v - Layer Input Vector (previous layer outputs 
+%                           + extra row with value 1)
+% Returns:
+%   o - Layer Output       (column)
+%   a - Neurons activation (row)
+function [o, a] = layerActivation(W, v, fun)
     % Neuron activation
-    a = weights * inputs;
+    a = W * v;
     
     % Function selection
     switch fun
-        case 'perceptron'
-            o = perceptron(a);
         case 'sigmoid'
             o = sigmoid(a);
         case 'tanh'
             o = hyperbolicTangent(a);
         otherwise
-            o = perceptron(a);
+            o = sigmoid(a);
     end
     
-    o = [o; ones(1, size(o, 2))];
+    o = o';
 end

@@ -42,7 +42,7 @@ labels = [loadMNISTLabels('./dataset/train-labels.idx1-ubyte');
 % Size of the output layer (from 0 to 9)
 sizeOutputLayer = 10;
 % Number of Neurons Per Layer
-numberNeuronsLayer = [size(images, 1), 10, 10, sizeOutputLayer];
+numberNeuronsLayer = [size(images, 1), 10, sizeOutputLayer];
 % Number of layers
 numLayers = length(numberNeuronsLayer) - 1;
 
@@ -61,7 +61,7 @@ k_value = 10;
 
 %                           CROSS VALIDATION 
 %                          ==================
-crossValidationTraining(Weights, images, labels, 'perceptron', k_value);
+crossValidationTraining(Weights, images, labels, 'sigmoid', k_value);
 
 "I'm done, no errors"
 
