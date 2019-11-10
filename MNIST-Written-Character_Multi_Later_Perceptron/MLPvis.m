@@ -4,7 +4,7 @@ close all
 tic 
 
 % random seed
-rng(2);
+rng(3);
 
 % specify target output function (represented by function pointers here)
 target = @outputXOr
