@@ -37,29 +37,38 @@ classdef MLP < handle
                                                    input)
             % Hidden Layers
             hiddenNet = obj.hiddenWeights * [input; 1];
-            hidden    = sigmoid(hiddenNet)';
+            hidden    = sigmoid(hiddenNet);
             % Output Layer
             outputNet = obj.outputWeights * [hidden; 1]; 
-            output    = sigmoid(outputNet)';
+            output    = sigmoid(outputNet);
         end
         
         function output = compute_output(obj, input)
-            [hN, h, oN, output] = obj.compute_net_activation(input);
+            [hN, h, oN, o] = obj.compute_net_activation(input);
+            
+            % Retrieves the index of the most likely solution
+            [m, idx] = max(o);
+            
+            % Solutions from 0 to 9 (not 1 to 10)
+            output = idx - 1;
         end
         
         function obj = adapt_to_target(obj, input, target, rate)
             [hN, h, oN, o] = obj.compute_net_activation(input);
             
             % Output Update
-            t = zeros(obj.outputDim, 1);
-            t(target + 1) = 1;
+            if obj.outputDim > 1
+                t = zeros(obj.outputDim, 1);
+                t(target + 1) = 1;
+            else
+                t = target;
+            end
             
             % Output
-            % TODO: Change for t
-            e_out  = o - target;
+            e_out  = o - t;
             d_out  = e_out .* (o .* (1 - o));
             Aw_out = d_out * [h; 1].';
-                
+            
             % Hidden
             e_hidden  = obj.outputWeights.' * d_out;
             e_hidden  = e_hidden(1 : end - 1);
