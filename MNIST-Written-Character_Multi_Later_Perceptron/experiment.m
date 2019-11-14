@@ -33,8 +33,8 @@ labels = loadMNISTLabels('./dataset/train-labels.idx1-ubyte');%;
 %                            ==============
 % We are using display_network from the autoencoder code
 % TODO: Remove comment 
-% display_network(images(:, 1 : 100)); % Show the first 100 images
-% disp(labels(1 : 10));
+display_network(images(:, 1 : 100)); % Show the first 100 images
+disp(labels(1 : 10));
 
 %                       NEURAL NETWORK TRAINING
 %                      =========================
