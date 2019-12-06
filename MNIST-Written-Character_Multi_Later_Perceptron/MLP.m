@@ -92,7 +92,7 @@ classdef MLP < handle
                     if i == 1 
                         in = input;
                     else
-                        in = cell2mat(hidden(i - 1));
+                        in = cell2mat(hidden(i - 1));% TODO
                     end
                     h = cell2mat(obj.hiddenWeights(i)) * [in; 1];
                     hiddenNet(i) = mat2cell(h,          ...
@@ -111,6 +111,7 @@ classdef MLP < handle
         
         function output = compute_output(obj, input)
             [hN, h, oN, o] = obj.compute_net_activation(input);
+            
             % Output
             if obj.outputDim == 1
                 output = o;
@@ -157,13 +158,16 @@ classdef MLP < handle
                 
                 % Hidden
                 for i = obj.numHidden : -1 : 1
+                    % Last Hidden
                     if i == obj.numHidden
                         d = d_out; 
                         w = obj.outputWeights;
                         v = [cell2mat(h(i - 1)); 1];
+                    % First Hidden
                     elseif i == 1
-                        w = cell2mat(obj.hiddenWeights(i + 1));
+                        w = cell2mat(obj.hiddenWeights(2));
                         v = [input; 1];
+                    % Inner Hiddens
                     else
                         w = cell2mat(obj.hiddenWeights(i + 1));
                         v = [cell2mat(h(i - 1)); 1];
