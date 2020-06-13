@@ -1,4 +1,7 @@
-classdef MLP < handle
+
+....
+    00.
+v  classdef MLP < handle
     properties (SetAccess = private)
         % Dimensions
         inputDim
@@ -46,7 +49,7 @@ classdef MLP < handle
             obj.outputWeights = zeros(outputD, hiddenD + 1);
         end
         
-        function obj = initWeight(obj, variance)
+        function [obj, hw] = initWeight(obj, variance)
             % Hidden Layers
             if obj.numHidden == 1
                obj.hiddenWeights = - variance            ...
@@ -65,6 +68,7 @@ classdef MLP < handle
                                                     size_cell(2));
                 end 
             end
+            
             % Output Layer                   
             obj.outputWeights = - variance            ...
                                 + 2 * variance        ...
@@ -92,7 +96,7 @@ classdef MLP < handle
                     if i == 1 
                         in = input;
                     else
-                        in = cell2mat(hidden(i - 1));% TODO
+                        in = cell2mat(hidden(i - 1));
                     end
                     h = cell2mat(obj.hiddenWeights(i)) * [in; 1];
                     hiddenNet(i) = mat2cell(h,          ...
@@ -165,7 +169,7 @@ classdef MLP < handle
                         v = [cell2mat(h(i - 1)); 1];
                     % First Hidden
                     elseif i == 1
-                        w = cell2mat(obj.hiddenWeights(2));
+                        w = cell2mat(obj.hiddenWeights(i + 1));
                         v = [input; 1];
                     % Inner Hiddens
                     else

@@ -39,28 +39,30 @@ disp(labels(1 : 10));
 %                      =========================
 
 % Preparation for different consecutive experiments
+% Preparation for different consecutive experiments
 numExperiments = 3;
-hiddenNum     = [1, 2, 3];
-mean_errors    = zeros(length(hiddenNum), numExperiments);
-times          = zeros(length(hiddenNum), numExperiments);
+hiddenDims     = [10, 20, 35, 50];
+mean_errors    = zeros(length(hiddenDims), numExperiments);
+times          = zeros(length(hiddenDims), numExperiments);
 
 % Number of fragments in cross-validation
 k_value = 10;
 % Data partitioning
 [train, test] = crossValidationSet(images, labels, k_value);
 
-% Network Dimesions
-inputDim = size(images, 1);
-hiddenDim = 10;
-outputDim = 10;
-
-for h = 1 : 1 : length(hiddenNum)
+for h = 1 : 1 : length(hiddenDims)
     h
     for e = 1 : 1 : numExperiments
         e
         tic 
+        
+        % Network Dimesions
+        inputDim = size(images, 1);
+        hiddenDim = hiddenDims(h);
+        outputDim = 10;
+        
         % Network creation
-        net = MLP(inputDim, hiddenDim, outputDim, hiddenNum(h));
+        net = MLP(inputDim, hiddenDim, outputDim, 1);
         net = net.initWeight(1.0);
 
         % Error rate
@@ -96,7 +98,7 @@ end
 mean_errors
 times
 
-x = [1 : length(hiddenNum)];
+x = [1 : length(hiddenDims)];
 
 figure;
 subplot(2, 1, 1)
